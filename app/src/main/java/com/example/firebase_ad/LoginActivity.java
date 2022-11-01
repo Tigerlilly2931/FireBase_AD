@@ -16,11 +16,13 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.auth.UserProfileChangeRequest;
 
 public class LoginActivity extends AppCompatActivity {
 
     private EditText emailTextView, passwordTextView;
-    private Button Btn;
+    private Button Btn, toRegister;
     private ProgressBar progressbar;
 
     private FirebaseAuth mAuth;
@@ -31,11 +33,16 @@ public class LoginActivity extends AppCompatActivity {
         setContentView(R.layout.activity_login);
 
         mAuth = FirebaseAuth.getInstance();
+        if(mAuth.getCurrentUser() != null){
+            Intent intent = new Intent (LoginActivity.this, MainActivity.class);
+            startActivity(intent);
+        }
 
         // initialising all views through id defined above
         emailTextView = findViewById(R.id.email);
         passwordTextView = findViewById(R.id.password);
         Btn = findViewById(R.id.login);
+        toRegister = findViewById(R.id.register);
         progressbar = findViewById(R.id.progressBar);
 
         // Set on Click Listener on Sign-in button
@@ -47,14 +54,22 @@ public class LoginActivity extends AppCompatActivity {
             }
         });
 
+        toRegister.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(LoginActivity.this, RegistrationActivity.class);
+                startActivity(intent);
+            }
+        });
+
     }
 
     private void loginUserAccount(){
         progressbar.setVisibility(View.VISIBLE);
         String email, password;
-        email = emailTextView.getText().toString();
+        String[] splitter = emailTextView.getText().toString().split("\\s+");
+        email = splitter[0];
         password = passwordTextView.getText().toString();
-
         if(TextUtils.isEmpty(email)){
             Toast.makeText(getApplicationContext(), "Please enter email!", Toast.LENGTH_LONG).show();
             return;
@@ -71,6 +86,8 @@ public class LoginActivity extends AppCompatActivity {
                     Toast.makeText(getApplicationContext(), "Login successful!", Toast.LENGTH_LONG).show();
 
                     progressbar.setVisibility(View.GONE);
+                    emailTextView.setText("");
+                    passwordTextView.setText("");
                     Intent intent = new Intent(LoginActivity.this, MainActivity.class);
                     startActivity(intent);
                 }

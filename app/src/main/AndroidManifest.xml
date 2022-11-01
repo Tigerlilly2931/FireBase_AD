@@ -28,20 +28,21 @@
                 android:value="" />
         </activity>
         <activity
+            android:name=".MainActivity"
+            android:exported="false"
+            android:parentActivityName=".LoginActivity">
+            <meta-data
+                android:name="android.support.LoginActivity"
+                android:value="com.example.firebase_ad.LoginActivity"/>
+        </activity>
+        <activity
             android:name=".RegistrationActivity"
             android:exported="false">
             <meta-data
                 android:name="android.app.lib_name"
                 android:value="" />
         </activity>
-        <activity
-            android:name=".MainActivity"
-            android:exported="false">
 
-            <meta-data
-                android:name="android.app.lib_name"
-                android:value="" />
-        </activity>
     </application>
 
 </manifest>

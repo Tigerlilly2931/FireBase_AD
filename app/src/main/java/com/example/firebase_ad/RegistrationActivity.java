@@ -16,11 +16,13 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.auth.UserProfileChangeRequest;
 
 public class RegistrationActivity extends AppCompatActivity {
 
     private EditText emailTextView, passwordTextView;
-    private Button Btn;
+    private Button Btn, toLogIn;
     private ProgressBar progressbar;
     private FirebaseAuth mAuth;
 
@@ -30,10 +32,10 @@ public class RegistrationActivity extends AppCompatActivity {
         setContentView(R.layout.activity_registration);
 
         mAuth = FirebaseAuth.getInstance();
-
         emailTextView = findViewById(R.id.email);
         passwordTextView = findViewById(R.id.passwd);
         Btn = findViewById(R.id.btnregister);
+        toLogIn = findViewById(R.id.btnlogin);
         progressbar = findViewById(R.id.progressbar);
 
         Btn.setOnClickListener(new View.OnClickListener(){
@@ -42,14 +44,23 @@ public class RegistrationActivity extends AppCompatActivity {
                 registerNewUser();
             }
         });
+
+        toLogIn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(RegistrationActivity.this, LoginActivity.class);
+                startActivity(intent);
+            }
+        });
     }
 
     private void registerNewUser(){
-        progressbar.setVisibility(View.VISIBLE);
-        String email, password;
-        email = emailTextView.getText().toString();
-        password = passwordTextView.getText().toString();
 
+        String email, password;
+        String[] splitter = emailTextView.getText().toString().split("\\s+");
+        email = splitter[0];
+        password = passwordTextView.getText().toString();
+        progressbar.setVisibility(View.VISIBLE);
         if(TextUtils.isEmpty(email)){
             Toast.makeText(getApplicationContext(), "Please enter email!", Toast.LENGTH_LONG).show();
             return;
@@ -64,9 +75,14 @@ public class RegistrationActivity extends AppCompatActivity {
             public void onComplete(@NonNull Task<AuthResult> task) {
                 if(task.isSuccessful()){
                     Toast.makeText(getApplicationContext(), "Beep Boop You're In!", Toast.LENGTH_LONG).show();
-
+                    String[] split = email.split("@");
+                    String name = split[0].substring(0,1).toUpperCase() + split[0].substring(1).toLowerCase();
                     progressbar.setVisibility(View.GONE);
-
+                    FirebaseUser user = mAuth.getCurrentUser();
+                    UserProfileChangeRequest profileUpdates = new UserProfileChangeRequest.Builder().setDisplayName(name).build();
+                    user.updateProfile(profileUpdates);
+                    emailTextView.setText("");
+                    passwordTextView.setText("");
                     Intent intent = new Intent(RegistrationActivity.this, MainActivity.class);
                     startActivity(intent);
                 }
